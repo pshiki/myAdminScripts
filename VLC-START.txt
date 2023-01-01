@@ -1,0 +1,16 @@
+Пример из инета
+start /D "C:\Program Files\VideoLAN\VLC\" vlc.exe -I ntservice --ntservice-install --ntservice-name=VLC --ntservice-extraintf=dummy --ntservice-options="rtsp://192.168.0.40:554/play2.sdp --rtsp-caching=1200 –loop
+--sout=#transcode{vcodec=h264,vb=256,fps=10,scale=0,acodec=mp4a,ab=64,channels=1,samplerate=22050}:http{dst=:8081/1.flv} --no-sout-rtp-sap --no-sout-standard-sap --ttl=1 --sout-keep"
+
+
+Вручную
+:sout=#transcode{vcodec=h264,vb=300,ab=64,fps=25,width=256,height=192,acodec=mp3,samplerate=44100}:duplicate{dst=std{access=http{mime=video/x-flv},mux=ffmpeg{mux=flv},dst=:7777}}
+
+
+
+Установить службу
+start /D "C:\Program Files (x86)\VideoLAN\VLC" vlc.exe -I ntservice --ntservice-install --ntservice-name=VLC --ntservice-extraintf=dummy --ntservice-options="http://192.168.0.58:7777/ sout=#transcode{vcodec=h264,vb=300,ab=64,fps=25,width=640,height=480,acodec=mp3,samplerate=44100}:duplicate{dst=std{access=http{mime=video/x-flv},mux=ffmpeg{mux=flv},dst=:7777}}
+
+
+Удалить службу
+start /D "C:\Program Files (x86)\VideoLAN\VLC" vlc.exe -I ntservice --ntservice-uninstall --ntservice-name=VLC
