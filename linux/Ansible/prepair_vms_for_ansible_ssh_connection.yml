@@ -1,0 +1,24 @@
+---
+ - name: "Подготовка новых хостов для работы. Создание пользователя ansible, Добавление ssh ключа мастера на хосты, выдача sudo прав для пользователя ansible"
+   hosts: newhosts
+   become: yes
+
+   vars:
+         source_file: ./files/authorized_keys
+         dest_file: /home/ansible/.ssh
+
+   tasks:
+         - name: "Создаём пользователя"
+           shell: "adduser -m ansible ; mkdir /home/ansible/.ssh ; chown ansible:ansible /home/ansible/.ssh"
+
+         - name: "копируем ssh public key с master на hosts"
+           copy: src={{ source_file }} dest={{ dest_file }} mode=0600
+
+         - name: "Меняем права файлу authorized_keys (даём владельца ansible)"
+           shell: "chown ansible:ansible /home/ansible/.ssh/authorized_keys"
+
+         - name: "Даём пользователю ansible sudo без запроса ввода пароля"
+           lineinfile:
+                 path: /etc/sudoers
+                 line: "ansible ALL=(ALL:ALL) NOPASSWD: ALL"
+                 create: yes
