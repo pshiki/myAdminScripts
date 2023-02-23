@@ -8,8 +8,13 @@
          dest_file: /home/ansible/.ssh
 
    tasks:
-         - name: "Создаём пользователя"
+         - name: "Создаём пользователя в Centos"
            shell: "adduser -m ansible ; mkdir /home/ansible/.ssh ; chown ansible:ansible /home/ansible/.ssh"
+           when: ansible_os_family == "RedHat"
+
+         - name: "Создаём пользователя в Debian, Ubuntu"
+           shell: "useradd -m ansible -s /bin/bash ; mkdir /home/ansible/.ssh ; chown ansible:ansible /home/ansible/.ssh"
+           when: ansible_os_family == "Debian"
 
          - name: "копируем ssh public key с master на hosts"
            copy: src={{ source_file }} dest={{ dest_file }} mode=0600
@@ -22,3 +27,4 @@
                  path: /etc/sudoers
                  line: "ansible ALL=(ALL:ALL) NOPASSWD: ALL"
                  create: yes
+                 

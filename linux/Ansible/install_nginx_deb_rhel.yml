@@ -1,0 +1,24 @@
+---
+- name: "Install NGINX for Centos, Debian, Ubuntu"
+  hosts: all_servers
+  become: yes
+
+  vars:
+       nginx_repo_file: ./files/nginx/nginx.repo
+       yum_repos: /etc/yum.repos.d
+
+  tasks:
+        - name: "Check hosts avalible"
+          ansible.builtin.ping:
+
+        - block: ####Block for Centos####
+                - name: "Copy nginx repo file"
+                
+
+                - name: "Install Nginx Centos"
+                  yum: name=nginx state=latest
+
+                - name: "Start and enable Nginx"
+                  service: name=nginx.service state=started enabled=yes
+          when: ansible_os_family == "RedHat"        
+
