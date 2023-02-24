@@ -3,22 +3,78 @@
   hosts: all_servers
   become: yes
 
-  vars:
-       nginx_repo_file: ./files/nginx/nginx.repo
-       yum_repos: /etc/yum.repos.d
+#  vars:
+#       source_file: 
+#       dest_file: 
 
   tasks:
-        - name: "Check hosts avalible"
-          ansible.builtin.ping:
+  - name: "Print OS family"
+    ansible.builtin.debug:
+      var: ansible_os_family
 
-        - block: ####Block for Centos####
-                - name: "Copy nginx repo file"
-                
+  - name: Block for Centos
+    when: ansible_os_family == "RedHat"
+    block:
+      - name:
+        ansible.builtin.copy:
+          src: ./files/nginx/nginx.repo
+          dest: /etc/yum.repos.d/nginx.repo
+          owner: root
+          group: root
+          mode: '0644'
 
-                - name: "Install Nginx Centos"
-                  yum: name=nginx state=latest
+      - name: "Make updates for repo and packedges before nginx installation"
+        ansible.builtin.shell: "yum update -y"
 
-                - name: "Start and enable Nginx"
-                  service: name=nginx.service state=started enabled=yes
-          when: ansible_os_family == "RedHat"        
+      - name: "Install NGinx Centos"
+        ansible.builtin.dnf: 
+          name: nginx 
+          state: latest
 
+      - name: "Firewall configuring for NGinx access"
+        ansible.builtin.shell: "firewall-cmd --add-service=http --permanent && firewall-cmd --reload"
+
+      - name: "Start and enable Nginx"
+        ansible.builtin.service: 
+          name: nginx 
+          state: started 
+          enabled: true
+
+  - name: "Firewall base installation and configuring for Debian and Ubuntu"
+    when: (os == "debian11") or (os == "ubuntu22")
+    block:
+      - name: "Install ufw for Debian OS"
+        ansible.builtin.apt:
+          name: ufw
+          state: latest
+
+      - name: "configuring ufw for Debian OS"
+        ansible.builtin.command: "ufw default deny incoming ; ufw default allow outgoing ; ufw allow ssh ; sudo ufw allow 22 ; ufw allow http ; ufw allow 80 ; ufw --force enable"
+
+      - name: "show status ufw in Debian OS"
+        ansible.builtin.shell: "ufw status verbose"
+        register: results
+
+      - name: "Print results"
+        ansible.builtin.debug:
+          var: results.stdout_lines
+
+  - name: "Block for Debian and Ubuntu"
+    when: ansible_os_family == "Debian"
+    block:
+      - name: "Update OS and Packedges"
+        ansible.builtin.shell: "apt update -y && sudo apt upgrade -y"
+
+      - name: "Install NGinx Debian, Ubuntu"
+        ansible.builtin.apt: 
+          name: nginx 
+          state: latest
+
+      - name: "Firewall configuring for NGinx"
+        ansible.builtin.shell: "ufw allow 'nginx full'"
+
+      - name: "Start and enable Nginx"
+        ansible.builtin.service: 
+          name: nginx 
+          state: started 
+          enabled: true
