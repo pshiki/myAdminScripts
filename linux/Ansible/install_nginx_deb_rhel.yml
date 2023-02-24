@@ -31,10 +31,18 @@
           name: nginx 
           state: latest
 
-      - name: "Firewall configuring for NGinx access"
-        ansible.builtin.shell: "firewall-cmd --add-service=http --permanent && firewall-cmd --reload"
+      - name: "Firewall configuring for Centos NGinx access"
+        ansible.builtin.shell: "firewall-cmd --add-service=http --permanent && firewall-cmd --add-service=https --permanent && firewall-cmd --reload"
 
-      - name: "Start and enable Nginx"
+      - name: "firewall-cmd rules"
+        ansible.builtin.shell: "firewall-cmd --list-all"
+        register: results
+
+      - name: "show firewall-cmd rules"
+        ansible.builtin.debug:
+          var: results.stdout_lines
+
+      - name: "Start and enable Nginx in Centos"
         ansible.builtin.service: 
           name: nginx 
           state: started 
@@ -49,15 +57,7 @@
           state: latest
 
       - name: "configuring ufw for Debian OS"
-        ansible.builtin.command: "ufw default deny incoming ; ufw default allow outgoing ; ufw allow ssh ; sudo ufw allow 22 ; ufw allow http ; ufw allow 80 ; ufw --force enable"
-
-      - name: "show status ufw in Debian OS"
-        ansible.builtin.shell: "ufw status verbose"
-        register: results
-
-      - name: "Print results"
-        ansible.builtin.debug:
-          var: results.stdout_lines
+        ansible.builtin.shell: "ufw default deny incoming ; ufw default allow outgoing ; ufw allow ssh ; sudo ufw allow 22 ; ufw allow http ; ufw allow 80 ; ufw allow https ; ufw allow 443 ; ufw --force enable"
 
   - name: "Block for Debian and Ubuntu"
     when: ansible_os_family == "Debian"
@@ -72,6 +72,14 @@
 
       - name: "Firewall configuring for NGinx"
         ansible.builtin.shell: "ufw allow 'nginx full'"
+
+      - name: "show status ufw in Debian and Ubuntu OS"
+        ansible.builtin.shell: "ufw status verbose"
+        register: results
+
+      - name: "show ufw rules"
+        ansible.builtin.debug:
+          var: results.stdout_lines
 
       - name: "Start and enable Nginx"
         ansible.builtin.service: 
