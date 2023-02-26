@@ -1,0 +1,1 @@
+ROBOCOPY "\\5-srv-dsk\Company\03 Служба СОКОП\03.02 Отдел учебной работы\02.99 Файлообмен\Дистанционное обучение" "C:\Users\sdo\YandexDisk\Дистанционное обучение" /E /PURGE /XA:SH /R:10 /W:15 /MT:32 /V /NP > C:\Log\log.txt

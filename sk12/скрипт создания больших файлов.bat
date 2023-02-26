@@ -1,0 +1,1 @@
+fsutil file createnew C:\File.txt 10737418240
