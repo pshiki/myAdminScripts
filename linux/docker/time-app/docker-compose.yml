@@ -9,6 +9,10 @@ services:
     volumes:
       - /app/node_modules
       - ./frontend:/app
+    environment:
+      VITE_HOST: ${HOST:-localhost}
+      VITE_SCHEMA: ${SCHEMA:-http}
+
   api:
     build: ./api
     restart: always
@@ -20,26 +24,32 @@ services:
       - /app/node_modules
       - ./api:/app
     environment:
-      MYSQL_HOST = mysql
-      MYSQL_USER = root
-      MYSQL_PORT = '3306'
-      MYSQL_PASSWORD = password
-      MYSQL_DB = time_db
+      PORT: 5000
+      HOST: ${HOST}
+      SCHEMA: ${SCHEMA}
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PORT: ${MYSQL_PORT}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DB: ${MYSQL_DB}
+      TZ: ${TZ}
+
   mysql:
     image: mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: time_db
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB}
+      TZ: ${TZ:-Europe/Moscow}
     volumes:
         - mysql_data:/var/lib/mysql
     ports:
       - 3306:3306
+
   adminer:
     image: adminer
     restart: always
     ports: 
       - '8888:8080'
-
 volumes:
   mysql_data:

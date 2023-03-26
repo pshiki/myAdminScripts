@@ -1,4 +1,3 @@
-# Все авторские права принадлежат Bogdan Stashchuk
 # api
 
 API for the Time App

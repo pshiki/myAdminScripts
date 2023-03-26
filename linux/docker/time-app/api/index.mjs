@@ -7,11 +7,18 @@ import {
   deleteRecord,
 } from './src/utils/records.mjs'
 
-const PORT = 5000
-
 const app = express()
+
+const port = process.env.PORT || 5000;
+const host = process.env.HOST || 'localhost'
+const schema = process.env.SCHEMA || 'http'
+
 app.use(bodyParser.json())
-app.use(cors({orign:'http://10.10.0.15'}))
+app.use(cors({
+  orign: false,//`${schema}://${host}`,
+  preflightContinue: true,
+}))
+app.options('*', cors())
 
 app.get('/', (_, res) => {
   res.send('Hello from the time saving service!')
@@ -29,6 +36,7 @@ app.delete('/time/:id', async (req, res) => {
   res.send(await deleteRecord(req.params.id))
 })
 
-app.listen(PORT, () => {
-  console.log(`Express web server is running at http://10.10.0.15:${PORT}`)
+app.listen(port, () => {
+  console.log(`Express web server is running at ${schema}://${host}:${port}`);
+  console.log(process.env)
 })

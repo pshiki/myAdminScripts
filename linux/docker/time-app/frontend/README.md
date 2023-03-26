@@ -1,5 +1,3 @@
-# Все авторские права принадлежат Bogdan Stashchuk
-
 # frontend
 
 Frontend for the Time App

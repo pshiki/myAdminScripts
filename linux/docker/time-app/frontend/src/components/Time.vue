@@ -2,6 +2,9 @@
 import moment from 'moment'
 import { startInterval, saveTime, deleteTime } from '../utils/time'
 
+const host = import.meta.env.VITE_HOST;
+const schema = import.meta.env.VITE_SCHEMA;
+
 export default {
   props: {
     showSavedTimes: Boolean,
@@ -19,7 +22,8 @@ export default {
   },
   created: async function () {
     this.startInterval()
-    const res = await fetch('http://10.10.0.15:5555/times')
+
+    const res = await fetch(`${schema}://${host}:5555/times`)
     const json = await res.json()
     if (json.length) this.savedTimes = json
   },

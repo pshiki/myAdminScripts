@@ -1,5 +1,12 @@
 import moment from 'moment'
 
+let baseUrl = `${import.meta.env.VITE_SCHEMA}://${import.meta.env.VITE_HOST}`
+
+const port = import.meta.env.VITE_PORT || 5555;
+if (port) {
+  baseUrl += `:${port}`
+}
+
 function startInterval() {
   setInterval(() => {
     this.currentTime = moment().format('HH:mm:ss')
@@ -8,7 +15,7 @@ function startInterval() {
 
 async function saveTime() {
   const time = this.currentTime
-  const res = await fetch('http://10.10.0.15:5555/times', {
+  const res = await fetch(`${baseUrl}/times`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -23,7 +30,7 @@ async function saveTime() {
 }
 
 async function deleteTime(id) {
-  const res = await fetch(`http://10.10.0.15:5555/time/${id}`, {
+  const res = await fetch(`${baseUrl}/time/${id}`, {
     method: 'DELETE',
   })
   const json = await res.json()
