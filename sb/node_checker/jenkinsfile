@@ -1,0 +1,25 @@
+#!groovy
+pipeline {
+    agent any
+    stages {
+        stage('check FOR from multiline') {
+            steps {
+                sh '''#!/bin/bash
+                echo "start checking script" ; 
+                for i in $NODES; 
+                do 
+                grep -i "$i" "./ktsgssw.txt"; 
+                done
+                result=`echo $?`
+                if [ $result = "0" ]
+                then
+                echo -e "Наши ноды есть в списке! Смотри список выше"
+                else
+                echo -e "Наших нод нет в списке"
+                fi
+                echo "end checking script"
+                '''
+            }
+        }
+    }
+}
