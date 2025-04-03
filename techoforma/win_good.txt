@@ -1,0 +1,2 @@
+"Delete Files Older Than" Batch Script
+forfiles -p c:\pathtofiles\ -m *.rar -d -5 -c "cmd /c del @path"
